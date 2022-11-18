@@ -1,14 +1,15 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { useQuery } from 'react-query';
 import Planet from './Planet';
 
-const fetchPlanets = async () => {
-    const res = await fetch(`https://swapi.dev/api/planets/`)
+const fetchPlanets = async (pageNumber) => {
+    const res = await fetch(`https://swapi.dev/api/planets/?page=${pageNumber}`)
     return res.json();
 }
 
 export default function Planets() {
-    const {data, status} = useQuery('planets', fetchPlanets)
+    const [pageNumber, setPageNumber] = useState(1)
+    const {data, status} = useQuery(['planets', pageNumber], () => fetchPlanets(pageNumber))
 
     return (
     <div>
@@ -24,6 +25,10 @@ export default function Planets() {
                 {data.results.map(planet => <Planet key={planet.name} planet={planet} />)}
             </div>
         )}
+        <div>
+            <button onClick={()=> setPageNumber(page => page-1 )} disabled={pageNumber === 1}>Previous</button>
+            <button onClick={()=> setPageNumber(page => page+1 )} disabled={pageNumber === 6}>Next</button>
+        </div>
     </div>
   )
 }

@@ -1,14 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useQuery } from 'react-query';
 import Person from './Person';
 
-const fetchPeople = async () => {
-    const res = await fetch('http://swapi.dev/api/people/')
+const fetchPeople = async (pageNumber) => {
+    const res = await fetch(`https://swapi.dev/api/people/?page=${pageNumber}`)
     return res.json();
 }
 
 export default function People() {
-    const {data, status} = useQuery('people', fetchPeople)
+    const [pageNumber, setPageNumber] = useState(1)
+    const {data, status} = useQuery(['people', pageNumber], () => fetchPeople(pageNumber))
     console.log(data)
     return (
     <div>
@@ -24,6 +25,10 @@ export default function People() {
                 {data.results.map(person => <Person key={person.name} person={person} />)}
             </div>
         )}
+        <div>
+            <button onClick={()=> setPageNumber(page => page-1 )} disabled={pageNumber === 1}>Previous</button>
+            <button onClick={()=> setPageNumber(page => page+1 )} disabled={pageNumber === 6}>Next</button>
+        </div>
     </div>
   )
 }
